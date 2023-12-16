@@ -1,13 +1,9 @@
 package com.luizjacomn.seeddesafiocdc.novoautor;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -15,23 +11,31 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/autores")
+// 3
 public class AutoresController {
 
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Autowired
+    private ProibeAutorEmailDuplicadoValidator proibeAutorEmailDuplicadoValidator;
+
+    @InitBinder
+    // 1
+    public void init(WebDataBinder binder) {
+        binder.addValidators(proibeAutorEmailDuplicadoValidator);
+    }
+
     @PostMapping
     @Transactional
-    public ResponseEntity<?> salvar(@Valid @RequestBody NovoAutorRequest request, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.getAllErrors().toString());
-        }
-
+    // 1
+    // 2
+    public Autor salvar(@Valid @RequestBody NovoAutorRequest request) {
         var autor = request.toModel();
 
         entityManager.persist(autor);
 
-        return ResponseEntity.ok(autor);
+        return autor;
     }
 
 }
