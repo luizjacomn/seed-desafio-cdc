@@ -1,10 +1,13 @@
 package com.luizjacomn.seeddesafiocdc.novacategoria;
 
+import com.luizjacomn.seeddesafiocdc.validation.annotation.UniqueValue;
+
 import javax.validation.constraints.NotBlank;
 
 public class NovaCategoriaRequest {
 
     @NotBlank
+    @UniqueValue(domainClass = Categoria.class, field = "nome")
     private String nome;
 
     public String getNome() {

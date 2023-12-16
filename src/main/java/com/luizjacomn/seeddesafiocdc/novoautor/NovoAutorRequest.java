@@ -1,5 +1,6 @@
 package com.luizjacomn.seeddesafiocdc.novoautor;
 
+import com.luizjacomn.seeddesafiocdc.validation.annotation.UniqueValue;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
@@ -12,6 +13,7 @@ public class NovoAutorRequest {
 
     @Email
     @NotBlank
+    @UniqueValue(domainClass = Autor.class, field = "email")
     private String email;
 
     @Length(max = 400)
