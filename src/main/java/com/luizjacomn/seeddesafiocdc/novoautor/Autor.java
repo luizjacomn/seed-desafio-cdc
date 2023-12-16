@@ -24,18 +24,22 @@ public class Autor {
     @Deprecated
     public Autor() {}
 
+    public Autor(Long id) {
+        this.id = id;
+    }
+
     public Autor(String nome, String email, String descricao) {
         this.nome = nome;
         this.email = email;
         this.descricao = descricao;
     }
 
-    public String getNome() {
-        return nome;
+    public Long getId() {
+        return id;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public String getNome() {
+        return nome;
     }
 
     public String getEmail() {
@@ -56,10 +60,6 @@ public class Autor {
 
     public LocalDateTime getInstante() {
         return instante;
-    }
-
-    public void setInstante(LocalDateTime instante) {
-        this.instante = instante;
     }
 
 }

@@ -1,7 +1,6 @@
 package com.luizjacomn.seeddesafiocdc.validation.validator;
 
 import com.luizjacomn.seeddesafiocdc.validation.annotation.UniqueValue;
-import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -30,9 +29,7 @@ public class UniqueValueValidator implements ConstraintValidator<UniqueValue, Ob
                             .setParameter("value", value)
                             .getResultList();
 
-        var message = "Já existe um registro com o " + field + " = '" + value + "' no cadastro de '" + domainClass.getSimpleName() + "'";
-
-        Assert.isTrue(resultList.size() <= 1, message);
+        var message = "Já existe um registro com " + field + " = '" + value + "' no cadastro de '" + domainClass.getSimpleName() + "'";
 
         constraintValidatorContext.disableDefaultConstraintViolation();
         constraintValidatorContext.buildConstraintViolationWithTemplate(message).addConstraintViolation();
