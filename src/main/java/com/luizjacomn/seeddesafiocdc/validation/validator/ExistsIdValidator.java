@@ -23,6 +23,9 @@ public class ExistsIdValidator implements ConstraintValidator<ExistsId, Object> 
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
+        if (value == null) return true;
+
+
         var idField = Stream.of(domainClass.getDeclaredFields())
                             .filter(field -> field.isAnnotationPresent(Id.class))
                             .findAny()

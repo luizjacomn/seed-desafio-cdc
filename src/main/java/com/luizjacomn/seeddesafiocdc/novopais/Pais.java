@@ -1,6 +1,7 @@
 package com.luizjacomn.seeddesafiocdc.novopais;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Pais {
@@ -26,4 +27,18 @@ public class Pais {
     public String getNome() {
         return nome;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pais pais = (Pais) o;
+        return nome.equals(pais.nome);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nome);
+    }
+
 }

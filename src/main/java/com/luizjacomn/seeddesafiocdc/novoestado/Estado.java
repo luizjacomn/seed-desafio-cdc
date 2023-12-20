@@ -15,7 +15,7 @@ public class Estado {
     private String nome;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "pais_id", nullable = false)
     private Pais pais;
 
     @Deprecated
