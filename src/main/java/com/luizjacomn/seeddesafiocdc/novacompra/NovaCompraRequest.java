@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 @GroupSequenceProvider(PessoaSequenceGroupProvider.class)
+// 9
 public class NovaCompraRequest {
 
     @NotBlank
@@ -63,6 +64,7 @@ public class NovaCompraRequest {
     @NotBlank
     private final String cep;
 
+    // 1
     @NotNull
     @Valid
     private final NovoPedidoRequest pedido;
@@ -112,19 +114,26 @@ public class NovaCompraRequest {
         return Optional.ofNullable(codigoCupom);
     }
 
+    // 1
     public Compra toModel(EntityManager entityManager, CupomRepository cupomRepository) {
-
+        // 1
         var pais = entityManager.find(Pais.class, paisId);
 
+        // 1
         var gerarPedido = pedido.toModel(entityManager);
 
+        // 1
+        // 1 - passar função como argumento
         var compra = new Compra(email, nome, sobrenome, documento, endereco, complemento, cidade, pais, telefone, cep, gerarPedido);
 
+        // 1
         if (estadoId != null) {
             compra.setEstado(entityManager.find(Estado.class, estadoId));
         }
 
+        // 1
         if (StringUtils.hasText(codigoCupom)) {
+            // 1 - lançar exception (orElseThrow)
             var cupom = cupomRepository.findByCodigo(codigoCupom).orElseThrow();
             compra.aplicaCupom(cupom);
         }

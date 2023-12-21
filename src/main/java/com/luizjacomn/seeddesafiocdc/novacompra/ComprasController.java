@@ -5,7 +5,6 @@ import com.luizjacomn.seeddesafiocdc.validation.validator.VerificarCupomValidoVa
 import com.luizjacomn.seeddesafiocdc.validation.validator.VerificarEstadoPertenceAoPaisValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,17 +14,21 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/compras")
+// 6
 public class ComprasController {
 
     @PersistenceContext
     private EntityManager entityManager;
 
+    // 1
     @Autowired
     private CupomRepository cupomRepository;
 
+    // 1
     @Autowired
     private VerificarEstadoPertenceAoPaisValidator verificarEstadoPertenceAoPaisValidator;
 
+    // 1
     @Autowired
     private VerificarCupomValidoValidator verificarCupomValidoValidator;
 

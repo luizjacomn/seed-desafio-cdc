@@ -11,12 +11,14 @@ import javax.persistence.PersistenceContext;
 
 @RestController
 @RequestMapping("/compras/detalhe")
+// 1
 public class DetalheCompraController {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @GetMapping("/{id}")
+    // 1
     public DetalheCompraResponse buscar(@PathVariable Long id) {
         var compra = entityManager.find(Compra.class, id);
 
