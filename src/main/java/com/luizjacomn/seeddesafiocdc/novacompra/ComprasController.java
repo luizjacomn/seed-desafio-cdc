@@ -1,5 +1,7 @@
 package com.luizjacomn.seeddesafiocdc.novacompra;
 
+import com.luizjacomn.seeddesafiocdc.novocupom.CupomRepository;
+import com.luizjacomn.seeddesafiocdc.validation.validator.VerificarCupomValidoValidator;
 import com.luizjacomn.seeddesafiocdc.validation.validator.VerificarEstadoPertenceAoPaisValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +21,17 @@ public class ComprasController {
     private EntityManager entityManager;
 
     @Autowired
+    private CupomRepository cupomRepository;
+
+    @Autowired
     private VerificarEstadoPertenceAoPaisValidator verificarEstadoPertenceAoPaisValidator;
+
+    @Autowired
+    private VerificarCupomValidoValidator verificarCupomValidoValidator;
 
     @InitBinder
     public void init(WebDataBinder binder) {
-        binder.addValidators(verificarEstadoPertenceAoPaisValidator);
+        binder.addValidators(verificarEstadoPertenceAoPaisValidator, verificarCupomValidoValidator);
     }
 
     @PostMapping
@@ -31,7 +39,7 @@ public class ComprasController {
     // 1
     // 2
     public Compra salvar(@Valid @RequestBody NovaCompraRequest request) {
-        var compra = request.toModel(entityManager);
+        var compra = request.toModel(entityManager, cupomRepository);
 
         entityManager.persist(compra);
 

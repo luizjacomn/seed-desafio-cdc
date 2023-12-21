@@ -37,8 +37,16 @@ public class Cupom {
         return codigo;
     }
 
+    public BigDecimal getPercentualDesconto() {
+        return percentualDesconto;
+    }
+
     public LocalDateTime getDataExpiracao() {
         return dataExpiracao;
+    }
+
+    public boolean valido() {
+        return !LocalDateTime.now().isAfter(dataExpiracao);
     }
 
 }

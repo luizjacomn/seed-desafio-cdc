@@ -1,21 +1,26 @@
 package com.luizjacomn.seeddesafiocdc.novacompra;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.luizjacomn.seeddesafiocdc.novocupom.Cupom;
+import com.luizjacomn.seeddesafiocdc.novocupom.CupomRepository;
 import com.luizjacomn.seeddesafiocdc.novoestado.Estado;
 import com.luizjacomn.seeddesafiocdc.novopais.Pais;
 import com.luizjacomn.seeddesafiocdc.validation.annotation.ExistsId;
+import com.luizjacomn.seeddesafiocdc.validation.annotation.ExistsProperty;
 import com.luizjacomn.seeddesafiocdc.validation.groups.PessoaFisica;
 import com.luizjacomn.seeddesafiocdc.validation.groups.PessoaJuridica;
 import com.luizjacomn.seeddesafiocdc.validation.groups.PessoaSequenceGroupProvider;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 @GroupSequenceProvider(PessoaSequenceGroupProvider.class)
 public class NovaCompraRequest {
@@ -46,7 +51,7 @@ public class NovaCompraRequest {
 
     @JsonProperty("estado_id")
     @ExistsId(Estado.class)
-    private final Long estadoId;
+    private Long estadoId;
 
     @JsonProperty("pais_id")
     @ExistsId(Pais.class)
@@ -62,7 +67,10 @@ public class NovaCompraRequest {
     @Valid
     private final NovoPedidoRequest pedido;
 
-    public NovaCompraRequest(@NotBlank @Email String email, @NotBlank String nome, @NotBlank String sobrenome, @NotBlank @CPF(groups = PessoaFisica.class) @CNPJ(groups = PessoaJuridica.class) String documento, @NotBlank String endereco, @NotBlank String complemento, @NotBlank String cidade, Long estadoId, Long paisId, @NotBlank String telefone, @NotBlank String cep, @NotNull @Valid NovoPedidoRequest pedido) {
+    @ExistsProperty(domainClass = Cupom.class, field = "codigo")
+    private String codigoCupom;
+
+    public NovaCompraRequest(@NotBlank @Email String email, @NotBlank String nome, @NotBlank String sobrenome, @NotBlank @CPF(groups = PessoaFisica.class) @CNPJ(groups = PessoaJuridica.class) String documento, @NotBlank String endereco, @NotBlank String complemento, @NotBlank String cidade, Long paisId, @NotBlank String telefone, @NotBlank String cep, @NotNull @Valid NovoPedidoRequest pedido) {
         this.email = email;
         this.nome = nome;
         this.sobrenome = sobrenome;
@@ -70,7 +78,6 @@ public class NovaCompraRequest {
         this.endereco = endereco;
         this.complemento = complemento;
         this.cidade = cidade;
-        this.estadoId = estadoId;
         this.paisId = paisId;
         this.telefone = telefone;
         this.cep = cep;
@@ -85,6 +92,10 @@ public class NovaCompraRequest {
         return estadoId;
     }
 
+    public void setEstadoId(Long estadoId) {
+        this.estadoId = estadoId;
+    }
+
     public Long getPaisId() {
         return paisId;
     }
@@ -93,17 +104,32 @@ public class NovaCompraRequest {
         return pedido;
     }
 
-    public Compra toModel(EntityManager entityManager) {
-        Estado estado = null;
-        if (estadoId != null) {
-            estado = entityManager.find(Estado.class, estadoId);
-        }
+    public void setCodigoCupom(String codigoCupom) {
+        this.codigoCupom = codigoCupom;
+    }
+
+    public Optional<String> getCodigoCupom() {
+        return Optional.ofNullable(codigoCupom);
+    }
+
+    public Compra toModel(EntityManager entityManager, CupomRepository cupomRepository) {
 
         var pais = entityManager.find(Pais.class, paisId);
 
         var gerarPedido = pedido.toModel(entityManager);
 
-        return new Compra(email, nome, sobrenome, documento, endereco, complemento, cidade, estado, pais, telefone, cep, gerarPedido);
+        var compra = new Compra(email, nome, sobrenome, documento, endereco, complemento, cidade, pais, telefone, cep, gerarPedido);
+
+        if (estadoId != null) {
+            compra.setEstado(entityManager.find(Estado.class, estadoId));
+        }
+
+        if (StringUtils.hasText(codigoCupom)) {
+            var cupom = cupomRepository.findByCodigo(codigoCupom).orElseThrow();
+            compra.aplicaCupom(cupom);
+        }
+
+        return compra;
     }
 
 }

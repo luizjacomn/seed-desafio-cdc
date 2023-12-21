@@ -1,7 +1,10 @@
 package com.luizjacomn.seeddesafiocdc.novacompra;
 
+import com.luizjacomn.seeddesafiocdc.novocupom.Cupom;
+import com.luizjacomn.seeddesafiocdc.novocupom.CupomAplicado;
 import com.luizjacomn.seeddesafiocdc.novoestado.Estado;
 import com.luizjacomn.seeddesafiocdc.novopais.Pais;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import java.util.function.Function;
@@ -49,10 +52,13 @@ public class Compra {
     @OneToOne(mappedBy = "compra", cascade = CascadeType.PERSIST)
     private Pedido pedido;
 
+    @Embedded
+    private CupomAplicado cupomAplicado;
+
     @Deprecated
     public Compra() { }
 
-    public Compra(String email, String nome, String sobrenome, String documento, String endereco, String complemento, String cidade, Estado estado, Pais pais, String telefone, String cep, Function<Compra, Pedido> gerarPedido) {
+    public Compra(String email, String nome, String sobrenome, String documento, String endereco, String complemento, String cidade, Pais pais, String telefone, String cep, Function<Compra, Pedido> gerarPedido) {
         this.email = email;
         this.nome = nome;
         this.sobrenome = sobrenome;
@@ -60,7 +66,6 @@ public class Compra {
         this.endereco = endereco;
         this.complemento = complemento;
         this.cidade = cidade;
-        this.estado = estado;
         this.pais = pais;
         this.telefone = telefone;
         this.cep = cep;
@@ -103,6 +108,10 @@ public class Compra {
         return estado;
     }
 
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
+
     public Pais getPais() {
         return pais;
     }
@@ -118,4 +127,16 @@ public class Compra {
     public Pedido getPedido() {
         return pedido;
     }
+
+    public CupomAplicado getCupomAplicado() {
+        return cupomAplicado;
+    }
+
+    public void aplicaCupom(Cupom cupom) {
+        Assert.isTrue(cupom.valido(), "O cupom informado é inválido!");
+        Assert.isNull(cupomAplicado, "Não é possível alterar o cupom já aplicado!");
+
+        this.cupomAplicado = new CupomAplicado(cupom);
+    }
+
 }
