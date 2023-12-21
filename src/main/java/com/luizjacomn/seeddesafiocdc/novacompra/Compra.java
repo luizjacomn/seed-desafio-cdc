@@ -4,6 +4,7 @@ import com.luizjacomn.seeddesafiocdc.novoestado.Estado;
 import com.luizjacomn.seeddesafiocdc.novopais.Pais;
 
 import javax.persistence.*;
+import java.util.function.Function;
 
 @Entity
 public class Compra {
@@ -45,10 +46,13 @@ public class Compra {
 
     private String cep;
 
+    @OneToOne(mappedBy = "compra", cascade = CascadeType.PERSIST)
+    private Pedido pedido;
+
     @Deprecated
     public Compra() { }
 
-    public Compra(String email, String nome, String sobrenome, String documento, String endereco, String complemento, String cidade, Estado estado, Pais pais, String telefone, String cep) {
+    public Compra(String email, String nome, String sobrenome, String documento, String endereco, String complemento, String cidade, Estado estado, Pais pais, String telefone, String cep, Function<Compra, Pedido> gerarPedido) {
         this.email = email;
         this.nome = nome;
         this.sobrenome = sobrenome;
@@ -60,6 +64,7 @@ public class Compra {
         this.pais = pais;
         this.telefone = telefone;
         this.cep = cep;
+        this.pedido = gerarPedido.apply(this);
     }
 
     public Long getId() {
@@ -110,4 +115,7 @@ public class Compra {
         return cep;
     }
 
+    public Pedido getPedido() {
+        return pedido;
+    }
 }

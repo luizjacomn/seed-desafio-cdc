@@ -12,104 +12,85 @@ import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.group.GroupSequenceProvider;
 
 import javax.persistence.EntityManager;
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @GroupSequenceProvider(PessoaSequenceGroupProvider.class)
 public class NovaCompraRequest {
 
     @NotBlank
     @Email
-    private String email;
+    private final String email;
 
     @NotBlank
-    private String nome;
+    private final String nome;
 
     @NotBlank
-    private String sobrenome;
+    private final String sobrenome;
 
     @NotBlank
     @CPF(groups = PessoaFisica.class)
     @CNPJ(groups = PessoaJuridica.class)
-    private String documento;
+    private final String documento;
 
     @NotBlank
-    private String endereco;
+    private final String endereco;
 
     @NotBlank
-    private String complemento;
+    private final String complemento;
 
     @NotBlank
-    private String cidade;
+    private final String cidade;
 
     @JsonProperty("estado_id")
     @ExistsId(Estado.class)
-    private Long estadoId;
+    private final Long estadoId;
 
     @JsonProperty("pais_id")
     @ExistsId(Pais.class)
-    private Long paisId;
+    private final Long paisId;
 
     @NotBlank
-    private String telefone;
+    private final String telefone;
 
     @NotBlank
-    private String cep;
+    private final String cep;
 
-    public void setEmail(String email) {
+    @NotNull
+    @Valid
+    private final NovoPedidoRequest pedido;
+
+    public NovaCompraRequest(@NotBlank @Email String email, @NotBlank String nome, @NotBlank String sobrenome, @NotBlank @CPF(groups = PessoaFisica.class) @CNPJ(groups = PessoaJuridica.class) String documento, @NotBlank String endereco, @NotBlank String complemento, @NotBlank String cidade, Long estadoId, Long paisId, @NotBlank String telefone, @NotBlank String cep, @NotNull @Valid NovoPedidoRequest pedido) {
         this.email = email;
-    }
-
-    public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public void setSobrenome(String sobrenome) {
         this.sobrenome = sobrenome;
+        this.documento = documento;
+        this.endereco = endereco;
+        this.complemento = complemento;
+        this.cidade = cidade;
+        this.estadoId = estadoId;
+        this.paisId = paisId;
+        this.telefone = telefone;
+        this.cep = cep;
+        this.pedido = pedido;
     }
 
     public String getDocumento() {
         return documento;
     }
 
-    public void setDocumento(String documento) {
-        this.documento = documento;
-    }
-
-    public void setEndereco(String endereco) {
-        this.endereco = endereco;
-    }
-
-    public void setComplemento(String complemento) {
-        this.complemento = complemento;
-    }
-
-    public void setCidade(String cidade) {
-        this.cidade = cidade;
-    }
-
     public Long getEstadoId() {
         return estadoId;
-    }
-
-    public void setEstadoId(Long estadoId) {
-        this.estadoId = estadoId;
     }
 
     public Long getPaisId() {
         return paisId;
     }
 
-    public void setPaisId(Long paisId) {
-        this.paisId = paisId;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
-    public void setCep(String cep) {
-        this.cep = cep;
+    public NovoPedidoRequest getPedido() {
+        return pedido;
     }
 
     public Compra toModel(EntityManager entityManager) {
@@ -120,7 +101,9 @@ public class NovaCompraRequest {
 
         var pais = entityManager.find(Pais.class, paisId);
 
-        return new Compra(email, nome, sobrenome, documento, endereco, complemento, cidade, estado, pais, telefone, cep);
+        var gerarPedido = pedido.toModel(entityManager);
+
+        return new Compra(email, nome, sobrenome, documento, endereco, complemento, cidade, estado, pais, telefone, cep, gerarPedido);
     }
 
 }

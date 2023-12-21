@@ -6,6 +6,7 @@ import com.luizjacomn.seeddesafiocdc.novoautor.Autor;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 public class Livro {
@@ -35,11 +36,11 @@ public class Livro {
     @Column(name = "data_publicacao", nullable = false)
     private LocalDate dataPublicacao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "autor_id", nullable = false)
     private Autor autor;
 
@@ -120,6 +121,19 @@ public class Livro {
 
     public Autor getAutor() {
         return autor;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Livro livro = (Livro) o;
+        return isbn.equals(livro.isbn);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isbn);
     }
 
 }
